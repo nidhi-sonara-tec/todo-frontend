@@ -1,0 +1,86 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap");
+
+body {
+  background: #f8fafc;
+  font-family: "Poppins", sans-serif;
+}
+.App {
+  margin: 100px;
+}
+.btn-app {
+  background-color: #0f172a;
+  border-color: #0f172a;
+  padding: 10px 13px;
+  color: #fff;
+}
+.btn-app span {
+  margin-left: 5px;
+}
+.btn-app:hover {
+  background-color: transparent;
+  border-color: #0f172a;
+  color: #0f172a;
+}
+.task-list {
+  margin-top: 50px;
+}
+.notask-list{
+  height: 60vh;
+}
+.task-card {
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+/* .task-type{
+  background-color: #FDE68A;
+} */
+svg{
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 400;
+}
+.card-subtitle span {
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 400;
+}
+.edit-task{
+  cursor: pointer;
+  margin-right: 10px;
+}
+.delete-task{
+  cursor: pointer;
+  margin-right: 10px;
+
+}
+.task-type {
+  font-size: 16px;
+  font-weight: 550;
+  line-height: 1.5;
+}
+.task-type.design-badge {
+  background-color: #fffbeb;
+  color: #fddd74;
+}
+.task-type.frontend-badge {
+  background-color: #ecfdf5;
+  color: #34d399;
+}
+.task-type.devops-badge {
+  background-color: #ecf3fd;
+  color: #345bd3;
+}
+.task-type.backend-badge {
+  background-color: #fdf2ec;
+  color: #d37834;
+}
+.task-card h6 {
+  line-height: 1.5;
+}
+@media (max-width: 767px) {
+  .App {
+    margin: 60px 20px;
+  }
+  .btn-app {
+    padding: 6px 8px;
+  }
+}
