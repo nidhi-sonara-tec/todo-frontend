@@ -35,6 +35,7 @@ import {
 import { useDispatch } from "react-redux";
 import { ToasterMessage } from "../helper/ToasterHelper";
 import { TodoType } from "../helper/ResponseType";
+import { fetchTaskDataByStatus } from "../helper/fetchData";
 
 interface TaskType {
   readonly title: string;
@@ -72,40 +73,16 @@ function TaskCard({ id, index, title, type, assignee, description }: TaskType) {
         return "";
     }
   };
-  const getToBeStartList = (id: string) => {
-    ApiUtils.getTasksList(id)
-      .then((res) => {
-        if (res.status === 200) {
-          dispatch(setTobeStartData(res.data));
-        }
-      })
-      .catch((err) => {});
-  };
-  const getInProgressTaskList = (id: string) => {
-    ApiUtils.getTasksList(id)
-      .then((res) => {
-        if (res.status === 200) {
-          dispatch(setInProgressData(res.data));
-        }
-      })
-      .catch((err) => {});
-  };
-  const getTaskDoneList = (id: string) => {
-    ApiUtils.getTasksList(id)
-      .then((res) => {
-        if (res.status === 200) {
-          dispatch(setTaskDoneData(res.data));
-        }
-      })
-      .catch((err) => {});
+  const getTaskData = (status: string, action: any) => {
+    fetchTaskDataByStatus(status, action, dispatch);
   };
   const handleDeleteTask = (id: string) => {
     ApiUtils.deleteTask(id)
       .then((res) => {
         if (res.status === 200) {
-          getToBeStartList(TASK_STATUS_TO_BE_START);
-          getInProgressTaskList(TASK_STATUS_IN_PROGRESS);
-          getTaskDoneList(TASK_STATUS_COMPLETED);
+          getTaskData(TASK_STATUS_TO_BE_START, setTobeStartData);
+          getTaskData(TASK_STATUS_IN_PROGRESS, setInProgressData);
+          getTaskData(TASK_STATUS_COMPLETED, setTaskDoneData);
           ToasterMessage("success", "Task Deleted Successfully");
         }
       })

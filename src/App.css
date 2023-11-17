@@ -84,10 +84,6 @@ svg{
 .col-lg-4{
   border: 1px dotted lightgray
 }
-/* [data-rbd-droppable-id="ToBeStart"], [data-rbd-droppable-id="InProgress"], [data-rbd-droppable-id="Completed"] {
-border: 2px dotted lightgray;
-padding: 5px 15px
-} */
 .modal-head-text{
   font-size: 14px;
   margin-top: 10px

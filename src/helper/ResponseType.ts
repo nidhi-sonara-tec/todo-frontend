@@ -11,3 +11,19 @@ export interface TodoProps {
   readonly tasks: TodoType[];
   readonly todoStatusTitle: string
 }
+
+export interface TaskTypes {
+  tasks: {
+    taskStarted: TodoType[];
+    taskInProgress: TodoType[];
+    taskDone: TodoType[];
+  };
+}
+
+export interface MyModalProps {
+  show: boolean;
+  readonly onHide: () => void;
+  titleText: string;
+  buttonText: string
+  modalData?: TodoType;
+}

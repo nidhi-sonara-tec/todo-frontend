@@ -6,19 +6,22 @@ import { Row } from "react-bootstrap";
 import Col from "react-bootstrap/Col";
 import { useDispatch } from "react-redux";
 import ApiUtils from "../api/ApiUtils";
-import { setTobeStartData } from "../store/reducers/tasksSlice";
-import { TodoType } from "./ResponseType";
-import { TASK_STATUS_TO_BE_START } from "../config/Constants";
+import {
+  setInProgressData,
+  setTaskDoneData,
+  setTobeStartData,
+} from "../store/reducers/tasksSlice";
+import { MyModalProps } from "./ResponseType";
+import {
+  TASK_STATUS_COMPLETED,
+  TASK_STATUS_IN_PROGRESS,
+  TASK_STATUS_TO_BE_START,
+} from "../config/Constants";
 import { ToasterMessage } from "./ToasterHelper";
+import { fetchTaskDataByStatus } from "./fetchData";
 
 // Props for the ModalHelper component
-interface MyModalProps {
-  show: boolean;
-  readonly onHide: () => void;
-  titleText: string;
-  buttonText: string
-  modalData?: TodoType;
-}
+
 function ModalHelper({
   show,
   onHide,
@@ -35,6 +38,11 @@ function ModalHelper({
   });
   const dispatch = useDispatch();
 
+  // Fetch and update the To Be Start task list
+
+  const getTaskData = (status: string, action: any) => {
+    fetchTaskDataByStatus(status, action, dispatch);
+  };
   // Handle input changes in the form
   const handleTask = (e: ChangeEvent<HTMLInputElement>) => {
     setTaskObj((prev) => {
@@ -58,71 +66,57 @@ function ModalHelper({
     }
   }, [show, modalData]);
 
-  // Fetch and update the To Be Start task list
-  const getToBeStartList = (id: string) => {
-    ApiUtils.getTasksList(id)
-      .then((res) => {
-        if (res.status === 200) {
-          dispatch(setTobeStartData(res.data));
-        }
-      })
-      .catch((err) => {});
-  };
-
   // Handle form submission
   const handleSubmitChange = () => {
     // Validate form data
-    if (
-      !taskObj.title ||
-      !taskObj.type ||
-      !taskObj.description ||
-      !taskObj.assignee ||
-      !taskObj.currentStateId
-    ) {
+    if (Object.values(taskObj).some((value) => !value)) {
       ToasterMessage("warning", "Please fill all the details");
-    } else {
-      const newTodo = {
-        title: taskObj.title,
-        type: taskObj.type,
-        description: taskObj.description,
-        assignee: taskObj.assignee,
-        currentStateId: modalData?.currentStateId ?? TASK_STATUS_TO_BE_START,
-      };
-
-      if (modalData?._id) {
-        // Edit existing task
-
-        ApiUtils.editTask(newTodo, modalData?._id)
-          .then((res) => {
-            if (res.status === 200) {
-              getToBeStartList(TASK_STATUS_TO_BE_START);
-              ToasterMessage("success", "Task Updated Successfully");
-            }
-          })
-          .catch((err) => {});
-      } else {
-        // Add new task
-
-        ApiUtils.addTask(newTodo)
-          .then((res) => {
-            if (res.status === 200) {
-              getToBeStartList(TASK_STATUS_TO_BE_START);
-              ToasterMessage("success", "Task Created Successfully");
-            }
-          })
-          .catch((err) => {});
-      }
-
-      onHide();
-      setTaskObj({
-        title: "",
-        type: "",
-        description: "",
-        assignee: "",
-        currentStateId: TASK_STATUS_TO_BE_START,
-      });
+      return;
     }
+    const newTodo = {
+      title: taskObj.title,
+      type: taskObj.type,
+      description: taskObj.description,
+      assignee: taskObj.assignee,
+      currentStateId: modalData?.currentStateId ?? TASK_STATUS_TO_BE_START,
+    };
+    if (modalData?._id) {
+      // Edit existing task
+
+      ApiUtils.editTask(newTodo, modalData?._id)
+        .then((res) => {
+          if (res.status === 200) {
+            getTaskData(TASK_STATUS_TO_BE_START, setTobeStartData);
+            getTaskData(TASK_STATUS_IN_PROGRESS, setInProgressData);
+            getTaskData(TASK_STATUS_COMPLETED, setTaskDoneData);
+            ToasterMessage("success", "Task Updated Successfully");
+          }
+        })
+        .catch((err) => {});
+    } else {
+      // Add new task
+
+      ApiUtils.addTask(newTodo)
+        .then((res) => {
+          if (res.status === 200) {
+            getTaskData(TASK_STATUS_TO_BE_START, setTobeStartData);
+            getTaskData(TASK_STATUS_IN_PROGRESS, setInProgressData);
+            getTaskData(TASK_STATUS_COMPLETED, setTaskDoneData);
+            ToasterMessage("success", "Task Created Successfully");
+          }
+        })
+        .catch((err) => {});
+    }
+    onHide();
+    setTaskObj({
+      title: "",
+      type: "",
+      description: "",
+      assignee: "",
+      currentStateId: TASK_STATUS_TO_BE_START,
+    });
   };
+
   return (
     <Modal
       data-testid="close-button"
@@ -136,13 +130,11 @@ function ModalHelper({
 
       <Modal.Header closeButton>
         <span className="d-flex flex-column">
-        <Modal.Title as="h5">{titleText}</Modal.Title>
-        <span className="modal-head-text">
-
-        Make changes to your tasks here. Click save when you're done.
+          <Modal.Title as="h5">{titleText}</Modal.Title>
+          <span className="modal-head-text">
+            Make changes to your tasks here. Click save when you're done.
+          </span>
         </span>
-        </span>
-          
       </Modal.Header>
       {/* Modal Body */}
 

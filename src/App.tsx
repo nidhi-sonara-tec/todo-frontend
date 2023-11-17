@@ -8,9 +8,9 @@ import ModalHelper from "./helper/Modal";
 import { useSelector, useDispatch } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
-import { DragDropContext, DropResult, Droppable } from "react-beautiful-dnd";
+import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import ApiUtils from "./api/ApiUtils";
-import { TodoType } from "./helper/ResponseType";
+import { TaskTypes, TodoType } from "./helper/ResponseType";
 import {
   CREATE_TASK,
   DROPPABLE_ID_DONE,
@@ -20,26 +20,14 @@ import {
   TASK_STATUS_COMPLETED,
   TASK_STATUS_IN_PROGRESS,
   TASK_STATUS_TO_BE_START,
-  TODO_STATUS_TITLE_DONE,
-  TODO_STATUS_TITLE_PROGRESS,
-  TODO_STATUS_TITLE_START,
 } from "./config/Constants";
-import TodoList from "./components/TodoList";
 import {
   setInProgressData,
   setTaskDoneData,
   setTobeStartData,
 } from "./store/reducers/tasksSlice";
-import { Col, Row } from "react-bootstrap";
-
-// Interface defining the structure of the tasks slice in the Redux store
-interface TaskTypes {
-  tasks: {
-    taskStarted: TodoType[];
-    taskInProgress: TodoType[];
-    taskDone: TodoType[];
-  };
-}
+import { fetchTaskDataByStatus } from "./helper/fetchData";
+import TodoListsContainer from "./components/TodoListsContainer";
 
 function App() {
   // State for controlling the visibility of the task creation modal
@@ -52,49 +40,18 @@ function App() {
 
   // Initial data fetching on component mount
   useEffect(() => {
-    getToBeStartList(TASK_STATUS_TO_BE_START);
-    getInProgressTaskList(TASK_STATUS_IN_PROGRESS);
-    getTaskDoneList(TASK_STATUS_COMPLETED);
+    getTaskData(TASK_STATUS_TO_BE_START, setTobeStartData);
+    getTaskData(TASK_STATUS_IN_PROGRESS, setInProgressData);
+    getTaskData(TASK_STATUS_COMPLETED, setTaskDoneData);
   }, []);
 
-  // Functions to fetch task data for task to be start
-  const getToBeStartList = (id: string) => {
-    ApiUtils.getTasksList(id)
-      .then((res) => {
-        if (res.status === 200) {
-          dispatch(setTobeStartData(res.data));
-        }
-      })
-      .catch((err) => { });
-  };
-
-  // Functions to fetch task data for task in progress
-
-  const getInProgressTaskList = (id: string) => {
-    ApiUtils.getTasksList(id)
-      .then((res) => {
-        if (res.status === 200) {
-          dispatch(setInProgressData(res.data));
-        }
-      })
-      .catch((err) => { });
-  };
-
-  // Functions to fetch task data for task completed
-
-  const getTaskDoneList = (id: string) => {
-    ApiUtils.getTasksList(id)
-      .then((res) => {
-        if (res.status === 200) {
-          dispatch(setTaskDoneData(res.data));
-        }
-      })
-      .catch((err) => { });
+  const getTaskData = (status: string, action: any) => {
+    fetchTaskDataByStatus(status, action, dispatch);
   };
 
   // Drag and drop logic when tasks are moved between statuses
 
-  function moveObject(data: any, fromIndex:number, toIndex:number) {
+  function moveObject(data: any, fromIndex: number, toIndex: number) {
     // Ensure indices are within bounds
     if (
       fromIndex >= 0 &&
@@ -104,14 +61,13 @@ function App() {
     ) {
       // Remove the object from the "from" index
       const [movedObject] = data.splice(fromIndex, 1);
-  
+
       // Insert the object at the "to" index
       data.splice(toIndex, 0, movedObject);
     }
-  
+
     return data;
   }
-  
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
@@ -126,30 +82,30 @@ function App() {
 
     // If trying to move a task from "To Be Started" directly to "Done", exit the function
 
-      if (
-        destination.droppableId === source.droppableId &&
-        destination.index !== source.index
-      ){
-      let data:any;
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index !== source.index
+    ) {
+      let data: any;
       if (source.droppableId === DROPPABLE_ID_START) {
         data = [...taskData.taskStarted];
-        } else if (source.droppableId === DROPPABLE_ID_PROGRESS) {
-          data = [...taskData.taskInProgress];
-        } else if (source.droppableId === DROPPABLE_ID_DONE) {
-          data = [...taskData.taskDone];
-        }  
-        data=[...data]    
-      const updatedData = moveObject(data,source.index, destination.index);
-  
+      } else if (source.droppableId === DROPPABLE_ID_PROGRESS) {
+        data = [...taskData.taskInProgress];
+      } else if (source.droppableId === DROPPABLE_ID_DONE) {
+        data = [...taskData.taskDone];
+      }
+      data = [...data];
+      const updatedData = moveObject(data, source.index, destination.index);
+
       if (source.droppableId === DROPPABLE_ID_START) {
         dispatch(setTobeStartData(updatedData));
       } else if (source.droppableId === DROPPABLE_ID_PROGRESS) {
         dispatch(setInProgressData(updatedData));
       } else if (source.droppableId === DROPPABLE_ID_DONE) {
         dispatch(setTaskDoneData(updatedData));
-      }     
-        return;
       }
+      return;
+    }
     if (
       destination.droppableId === DROPPABLE_ID_DONE &&
       source.droppableId === DROPPABLE_ID_START
@@ -158,7 +114,6 @@ function App() {
 
     // Placeholder variable to store the task being moved
 
-     
     let add;
 
     // Copying the task arrays for each status
@@ -186,9 +141,9 @@ function App() {
       ApiUtils.editTask(newTodo, newTodo._id as string)
         .then((res) => {
           if (res.status === 200) {
-            getToBeStartList(TASK_STATUS_TO_BE_START);
-            getInProgressTaskList(TASK_STATUS_IN_PROGRESS);
-            getTaskDoneList(TASK_STATUS_COMPLETED);
+            getTaskData(TASK_STATUS_TO_BE_START, setTobeStartData);
+            getTaskData(TASK_STATUS_IN_PROGRESS, setInProgressData);
+            getTaskData(TASK_STATUS_COMPLETED, setTaskDoneData);
           }
         })
         .catch((err) => {});
@@ -201,24 +156,24 @@ function App() {
       ApiUtils.editTask(newTodo, newTodo._id as string)
         .then((res) => {
           if (res.status === 200) {
-            getToBeStartList(TASK_STATUS_TO_BE_START);
-            getInProgressTaskList(TASK_STATUS_IN_PROGRESS);
-            getTaskDoneList(TASK_STATUS_COMPLETED);
+            getTaskData(TASK_STATUS_TO_BE_START, setTobeStartData);
+            getTaskData(TASK_STATUS_IN_PROGRESS, setInProgressData);
+            getTaskData(TASK_STATUS_COMPLETED, setTaskDoneData);
           }
         })
-        .catch((err) => { });
+        .catch((err) => {});
     } else if (destination.droppableId === DROPPABLE_ID_DONE) {
       completed.splice(destination.index, 0, add as TodoType);
       const newTodo = { ...add, currentStateId: TASK_STATUS_COMPLETED };
       ApiUtils.editTask(newTodo, newTodo._id as string)
         .then((res) => {
           if (res.status === 200) {
-            getToBeStartList(TASK_STATUS_TO_BE_START);
-            getInProgressTaskList(TASK_STATUS_IN_PROGRESS);
-            getTaskDoneList(TASK_STATUS_COMPLETED);
+            getTaskData(TASK_STATUS_TO_BE_START, setTobeStartData);
+            getTaskData(TASK_STATUS_IN_PROGRESS, setInProgressData);
+            getTaskData(TASK_STATUS_COMPLETED, setTaskDoneData);
           }
         })
-        .catch((err) => { });
+        .catch((err) => {});
     }
     dispatch(setInProgressData(inProgress));
     dispatch(setTobeStartData(tobeStart));
@@ -241,73 +196,7 @@ function App() {
               </Button>
             </div>
           </Stack>
-          {taskData.taskStarted.length > 0 ||
-            taskData.taskInProgress.length > 0 ||
-            taskData.taskDone.length > 0 ? (
-            <div className="task-list">
-              <Row>
-                <Col lg={4} md={6}>
-                <Droppable droppableId="ToBeStart">
-                {(provided) => (
-                  <div
-                    className=""
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                  >
-                    <TodoList
-                      tasks={taskData.taskStarted}
-                      todoStatusTitle={TODO_STATUS_TITLE_START}
-                    />
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-                </Col>
-             <Col lg={4} md={6}>
-
-              <Droppable droppableId="InProgress">
-                {(provided) => (
-                  <div
-                    className=""
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                  >
-                    <TodoList
-                      tasks={taskData.taskInProgress}
-                      todoStatusTitle={TODO_STATUS_TITLE_PROGRESS}
-                    />
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-             </Col>
-
-<Col lg={4} md={6}>
-
-              <Droppable droppableId="Completed">
-                {(provided) => (
-                  <div
-                    className=""
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                  >
-                    <TodoList
-                      tasks={taskData.taskDone}
-                      todoStatusTitle={TODO_STATUS_TITLE_DONE}
-                    />
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-</Col>
-</Row>
-
-            </div>
-          ) : (
-            <div className="d-flex justify-content-center align-items-center flex-wrap notask-list">
-              <h4 className="text-center">No data, yet</h4>
-            </div>
-          )}
+          <TodoListsContainer />
         </Container>
         <ModalHelper
           show={showModal}
