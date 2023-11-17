@@ -135,14 +135,21 @@ function ModalHelper({
       {/* Modal Header */}
 
       <Modal.Header closeButton>
+        <span className="d-flex flex-column">
         <Modal.Title as="h5">{titleText}</Modal.Title>
+        <span className="modal-head-text">
+
+        Make changes to your tasks here. Click save when you're done.
+        </span>
+        </span>
+          
       </Modal.Header>
       {/* Modal Body */}
 
       <Modal.Body>
         <Form>
           <Form.Group className="mb-4" controlId="exampleForm.ControlInput1">
-            <Form.Label>Task</Form.Label>
+            <Form.Label>Name</Form.Label>
             <Form.Control
               type="text"
               placeholder="Task Name"
@@ -151,7 +158,7 @@ function ModalHelper({
               value={taskObj?.title}
             />
           </Form.Group>
-          <Form.Label>Task Type</Form.Label>
+          <Form.Label>Type</Form.Label>
           <Row>
             <Form.Group className="mb-3" as={Col} sm="6">
               <Form.Check
@@ -205,13 +212,14 @@ function ModalHelper({
             </Form.Group>{" "}
           </Row>
           <Form.Group className="mb-4" controlId="exampleForm.ControlTextarea1">
-            <Form.Label>Task Description</Form.Label>
+            <Form.Label>Description</Form.Label>
             <Form.Control
               as="textarea"
               onChange={handleTask}
               name="description"
               rows={2}
               value={taskObj?.description}
+              placeholder="Write description about the task..."
             />
           </Form.Group>
           <Form.Group className="mb-4" controlId="exampleForm.ControlInput1">

@@ -30,6 +30,7 @@ import {
   setTaskDoneData,
   setTobeStartData,
 } from "./store/reducers/tasksSlice";
+import { Col, Row } from "react-bootstrap";
 
 // Interface defining the structure of the tasks slice in the Redux store
 interface TaskTypes {
@@ -243,8 +244,10 @@ function App() {
           {taskData.taskStarted.length > 0 ||
             taskData.taskInProgress.length > 0 ||
             taskData.taskDone.length > 0 ? (
-            <div className="d-flex justify-content-between flex-wrap task-list">
-              <Droppable droppableId="ToBeStart">
+            <div className="task-list">
+              <Row>
+                <Col lg={4} md={6}>
+                <Droppable droppableId="ToBeStart">
                 {(provided) => (
                   <div
                     className=""
@@ -259,6 +262,9 @@ function App() {
                   </div>
                 )}
               </Droppable>
+                </Col>
+             <Col lg={4} md={6}>
+
               <Droppable droppableId="InProgress">
                 {(provided) => (
                   <div
@@ -274,6 +280,10 @@ function App() {
                   </div>
                 )}
               </Droppable>
+             </Col>
+
+<Col lg={4} md={6}>
+
               <Droppable droppableId="Completed">
                 {(provided) => (
                   <div
@@ -289,9 +299,12 @@ function App() {
                   </div>
                 )}
               </Droppable>
+</Col>
+</Row>
+
             </div>
           ) : (
-            <div className="justify-content-center align-items-center flex-wrap notask-list">
+            <div className="d-flex justify-content-center align-items-center flex-wrap notask-list">
               <h4 className="text-center">No data, yet</h4>
             </div>
           )}

@@ -29,6 +29,11 @@ body {
 }
 .task-card {
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  width: 100%;
+}
+.form-label{
+  font-weight: 500;
+
 }
 /* .task-type{
   background-color: #FDE68A;
@@ -76,6 +81,20 @@ svg{
 .task-card h6 {
   line-height: 1.5;
 }
+.col-lg-4{
+  border: 1px dotted lightgray
+}
+/* [data-rbd-droppable-id="ToBeStart"], [data-rbd-droppable-id="InProgress"], [data-rbd-droppable-id="Completed"] {
+border: 2px dotted lightgray;
+padding: 5px 15px
+} */
+.modal-head-text{
+  font-size: 14px;
+  margin-top: 10px
+}
+.modal-header{
+  align-items:flex-start
+}
 @media (max-width: 767px) {
   .App {
     margin: 60px 20px;
@@ -83,4 +102,5 @@ svg{
   .btn-app {
     padding: 6px 8px;
   }
+ 
 }

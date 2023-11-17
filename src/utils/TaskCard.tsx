@@ -121,7 +121,7 @@ function TaskCard({ id, index, title, type, assignee, description }: TaskType) {
             {...provided.draggableProps}
             {...provided.dragHandleProps}
           >
-            <Card style={{ width: "25rem" }} className="task-card mt-3 mb-3">
+            <Card className="task-card mt-3 mb-3">
               <Card.Body>
                 <div className="d-flex justify-content-between align-items-center">
                   <Badge pill bg="" className={`task-type ${getBadgeClass()}`}>
@@ -146,14 +146,15 @@ function TaskCard({ id, index, title, type, assignee, description }: TaskType) {
                   {title}
                 </Card.Title>
                 <Stack as="div">
+                <Card.Subtitle className="mb-2 mt-1 text-muted d-flex gap-2">
+                    <FaUserTie />
+                    <span>Assignee: {assignee}</span>
+                  </Card.Subtitle>
                   <Card.Subtitle className="mb-2 mt-1 text-muted d-flex gap-2">
                     <FaCalendarAlt />
                     <span>December 12, 2023</span>
                   </Card.Subtitle>
-                  <Card.Subtitle className="mb-2 mt-1 text-muted d-flex gap-2">
-                    <FaUserTie />
-                    <span>Assignee: {assignee}</span>
-                  </Card.Subtitle>
+                
                 </Stack>
               </Card.Body>
             </Card>
